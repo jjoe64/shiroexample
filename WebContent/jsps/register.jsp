@@ -10,9 +10,9 @@
 
 <%= request.getAttribute("message") %>
 
-<h1>Login</h1>
+<h1>Register</h1>
 
-<form action="login" method="post">
+<form action="register" method="post">
 	E-Mail
 	<input type="text" name="email" />
 	<br/>
