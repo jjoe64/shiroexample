@@ -15,11 +15,6 @@ import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.util.Factory;
-import org.hibernate.Session;
-
-import com.jjoe64.shiroexample.daos.UserDAO;
-import com.jjoe64.shiroexample.models.User;
-import com.jjoe64.shiroexample.util.HibernateUtil;
 
 /**
  * Servlet implementation class LoginServlet
@@ -49,28 +44,20 @@ public class LoginServlet extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html");
 
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		try {
-			session.beginTransaction();
-
-			// test
-			UserDAO userDAO = new UserDAO(session);
-			User user = userDAO.getUserByEmail("test@test.test");
-
-			request.setAttribute("user", user);
-
-			// draw JSP
-			try {
-				request.getRequestDispatcher("/jsps/login.jsp").include(
-						request, response);
-			} catch (ServletException e) {
-				e.printStackTrace();
-			}
-		} finally {
-			session.getTransaction().commit();
-			if (session.isOpen())
-				session.close();
+		if (request.getParameter("logout") != null) {
+			org.apache.shiro.subject.Subject currentUser = SecurityUtils
+					.getSubject();
+			currentUser.logout();
 		}
+
+		// draw JSP
+		try {
+			request.getRequestDispatcher("/includes/login.jsp").include(
+					request, response);
+		} catch (ServletException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	/**
@@ -89,15 +76,18 @@ public class LoginServlet extends HttpServlet {
 		} else {
 			boolean b = tryLogin(email, pwd, false);
 			if (b) {
-				request.setAttribute("message", "Login successful. Welcome. Open <a href='hello'>hello Servlet</a> to check if you are logged in.");
+				request.setAttribute(
+						"message",
+						"Login successful. Welcome. Open <a href='hello'>hello Servlet</a> to check if you are logged in.");
 			} else {
-				request.setAttribute("message", "wrong email/pwd or an error...");
+				request.setAttribute("message",
+						"wrong email/pwd or an error...");
 			}
 		}
 
 		// draw JSP
 		try {
-			request.getRequestDispatcher("/jsps/login.jsp").include(
+			request.getRequestDispatcher("/includes/login.jsp").include(
 					request, response);
 		} catch (ServletException e) {
 			e.printStackTrace();

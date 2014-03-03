@@ -19,6 +19,9 @@
 	Password
 	<input type="password" name="p" />
 	<br/>
+	Admin
+	<input type="checkbox" name="role_admin" value="1" />
+	<br/>
 	<input type="submit" />
 </form>
 

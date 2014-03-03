@@ -14,6 +14,7 @@ import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.hibernate.Session;
 
 import com.jjoe64.shiroexample.models.User;
+import com.jjoe64.shiroexample.models.UserRole;
 import com.jjoe64.shiroexample.util.HibernateUtil;
 
 /**
@@ -37,7 +38,7 @@ public class RegisterServlet extends HttpServlet {
 		response.setContentType("text/html");
 		// draw JSP
 		try {
-			request.getRequestDispatcher("/jsps/register.jsp").include(request,
+			request.getRequestDispatcher("/includes/register.jsp").include(request,
 					response);
 		} catch (ServletException e) {
 			e.printStackTrace();
@@ -54,13 +55,14 @@ public class RegisterServlet extends HttpServlet {
 		response.setContentType("text/html");
 		String email = request.getParameter("email");
 		String pwd = request.getParameter("p");
+		String admin = request.getParameter("role_admin");
 		if (email == null || pwd == null) {
 			request.setAttribute("message", "wrong parameters");
 		} else {
 			Session session = HibernateUtil.getSessionFactory().openSession();
 			session.beginTransaction();
 			try {
-				registrate(session, email, pwd);
+				registrate(session, email, pwd, admin!=null);
 				request.setAttribute("message", "user created. you can now <a href='login'>login</a>.");
 			} finally {
 				session.getTransaction().commit();
@@ -70,7 +72,7 @@ public class RegisterServlet extends HttpServlet {
 
 		// draw JSP
 		try {
-			request.getRequestDispatcher("/jsps/register.jsp").include(request,
+			request.getRequestDispatcher("/includes/register.jsp").include(request,
 					response);
 		} catch (ServletException e) {
 			e.printStackTrace();
@@ -91,7 +93,7 @@ public class RegisterServlet extends HttpServlet {
 		user.setSalt(salt.toString());
 	}
 
-	private void registrate(Session session, String email, String plainTextPassword) {
+	private void registrate(Session session, String email, String plainTextPassword, boolean isAdmin) {
 		User user = new User();
 		user.setUsername(email);
 		user.setEmail(email);
@@ -102,6 +104,14 @@ public class RegisterServlet extends HttpServlet {
 		System.err.println("User with email:" + user.getEmail()
 				+ " hashedPassword:" + user.getPassword() + " salt:"
 				+ user.getSalt());
+
+		// create role
+		if (isAdmin) {
+			UserRole role = new UserRole();
+			role.setEmail(email);
+			role.setRoleName("admin");
+			session.save(role);
+		}
 	}
 
 }

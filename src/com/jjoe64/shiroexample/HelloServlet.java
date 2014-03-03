@@ -1,7 +1,6 @@
 package com.jjoe64.shiroexample;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,16 +20,22 @@ public class HelloServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		PrintWriter writer = response.getWriter();
+		response.setContentType("text/html");
 
-		writer.println("<html>");
-		writer.println("<head><title>Hello World Servlet</title></head>");
-		writer.println("<body>");
-		writer.println("	<h1>Hello World from a Sevlet! This page is only visible to registrated users. You are "+getCurrentUserEmail()+"</h1>");
-		writer.println("<body>");
-		writer.println("</html>");
+		request.setAttribute("currentEmail", getCurrentUserEmail());
 
-		writer.close();
+		org.apache.shiro.subject.Subject currentUser = SecurityUtils
+				.getSubject();
+		request.setAttribute("adminAccess", currentUser.isPermitted("admin:access"));
+
+		// draw JSP
+		try {
+			request.getRequestDispatcher("/includes/hello.jsp").include(
+					request, response);
+		} catch (ServletException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	public String getCurrentUserEmail() {
