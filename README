@@ -1,3 +1,30 @@
-Apache Shiro Web App Example project from my blog post:
+== Apache Shiro Web App Example project from my blog post
+Read the full tutorial at
 http://www.jjoe64.com/2014/01/apache-shiro-with-hibernatesql-full.html
+
+== Create the database schema
+To run this example you have to create the mysql database schema
+described at the blog post.
+
+To test the admin-permission example, ensure to create this entity
+in the RolesPermission table:
+> INSERT INTO `RolesPermission` VALUES (1,'admin:access','admin');
+
+Alternativly you can import the sql-dump file (dump.sql).
+
+== Set the mysql config
+You have to set the mysql username, password and database name in
+this files:
+ * src/hibernate.cfg.xml
+ * WebContent/WEB-INF/shiro.ini
+
+== Run example
+ * Register servlet
+   http://localhost:8080/shiroexample/register
+ * Login servlet
+   http://localhost:8080/shiroexample/login
+ * Protected area / only accessable for registered users
+   http://localhost:8080/shiroexample/hello
+ * Only for admin users
+   http://localhost:8080/shiroexample/admin
 
